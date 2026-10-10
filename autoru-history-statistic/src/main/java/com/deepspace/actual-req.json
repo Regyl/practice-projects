@@ -1,0 +1,21 @@
+{
+  "in_stock": "IN_STOCK",
+  "year_from": 2018,
+  "price_from": 2000000,
+  "price_to": 3000000,
+  "steering_wheel": "LEFT",
+  "acceleration_to": 5,
+  "body_type_group": [
+    "COUPE"
+  ],
+  "engine_group": [
+    "DIESEL",
+    "GASOLINE",
+    "TURBO",
+    "ATMO"
+  ],
+  "section": "all",
+  "category": "cars",
+  "output_type": "list",
+  "geo_id": []
+}

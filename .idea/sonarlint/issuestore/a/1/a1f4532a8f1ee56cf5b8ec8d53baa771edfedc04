@@ -1,8 +1,0 @@
-
-f	java:S117
-"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÃÇ‘Ö
-M	java:S106"9Replace this use of System.out or System.err by a logger.(Åéôw
-S	java:S106"9Replace this use of System.out or System.err by a logger.(àÈğÖşÿÿÿÿ
-c
-java:S3008"MRename this field "MD" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¹¤
-h	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ç÷şÿÿÿÿ

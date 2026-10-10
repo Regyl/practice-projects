@@ -32,6 +32,8 @@
         <module>../mybatis-sql-formatter</module>
         <module>../weld-demo</module>
         <module>../leetcode-templates</module>
+        <module>../autoru-history-statistic</module>
+        <module>../flink-example</module>
     </modules>
 
     <packaging>pom</packaging>
