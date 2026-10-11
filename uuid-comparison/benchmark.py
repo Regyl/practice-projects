@@ -5,6 +5,7 @@ import statistics
 import time
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import psycopg
 from psycopg import sql
 
@@ -13,6 +14,7 @@ STATS_PATH = ROOT / "statistics.csv"
 
 ROW_COUNTS = (1_000_000, 10_000_000, 100_000_000, 1_000_000_000)
 LOOKUP_REPEATS = 11
+HISTOGRAM_BINS = 10
 
 VARIANTS = (
     {
@@ -139,9 +141,40 @@ def run_benchmark(conn, row_counts, stats_path):
                 )
 
 
+def plot_histograms(stats_path):
+    with stats_path.open(newline="") as stats_file:
+        rows = list(csv.DictReader(stats_file))
+
+    metrics = []
+    for row in rows:
+        if row["metric"] not in metrics:
+            metrics.append(row["metric"])
+
+    for metric in metrics:
+        subset = [row for row in rows if row["metric"] == metric]
+        unit = subset[0]["unit"]
+        series = []
+        labels = []
+        for uuid_type in ("v7", "v4"):
+            values = [float(row["value"]) for row in subset if row["type"] == uuid_type]
+            series.append(values)
+            labels.append(uuid_type)
+
+        figure, axes = plt.subplots()
+        axes.hist(series, bins=HISTOGRAM_BINS, label=labels, alpha=0.6)
+        axes.set_title(metric)
+        axes.set_xlabel(unit)
+        axes.set_ylabel("count")
+        axes.legend()
+        figure.savefig(stats_path.with_name(f"{metric}_histogram.png"))
+
+    plt.show()
+
+
 def main():
     with connect() as conn:
         run_benchmark(conn, ROW_COUNTS, STATS_PATH)
+    plot_histograms(STATS_PATH)
 
 
 if __name__ == "__main__":
