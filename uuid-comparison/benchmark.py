@@ -11,7 +11,6 @@ ROOT = Path(__file__).resolve().parent
 STATS_PATH = ROOT / "statistics.csv"
 
 ROW_COUNTS = (1_000_000, 10_000_000, 100_000_000, 1_000_000_000)
-HISTOGRAM_BINS = 10
 
 VARIANTS = (
     {
@@ -69,6 +68,27 @@ def format_value(metric, value):
     return f"{value:.3f}"
 
 
+def format_row_count(row_count):
+    value = int(row_count)
+    if value >= 1_000_000_000 and value % 1_000_000_000 == 0:
+        return f"{value // 1_000_000_000}B"
+    if value >= 1_000_000 and value % 1_000_000 == 0:
+        return f"{value // 1_000_000}M"
+    return str(value)
+
+
+def display_value(metric, value):
+    if metric == "index_size":
+        return value / (1024 ** 2)
+    return value / 1000
+
+
+def display_unit(metric):
+    if metric == "index_size":
+        return "MiB"
+    return "s"
+
+
 def write_metric(stats_file, writer, row_count, uuid_type, metric, value, unit):
     rendered = format_value(metric, value)
     writer.writerow([row_count, uuid_type, metric, rendered, unit])
@@ -103,7 +123,7 @@ def run_benchmark(conn, row_counts, stats_path):
                 )
 
 
-def plot_histograms(stats_path):
+def plot_charts(stats_path):
     with stats_path.open(newline="") as stats_file:
         rows = list(csv.DictReader(stats_file))
 
@@ -112,22 +132,44 @@ def plot_histograms(stats_path):
         if row["metric"] not in metrics:
             metrics.append(row["metric"])
 
+    row_counts = []
+    for row in rows:
+        if row["rows"] not in row_counts:
+            row_counts.append(row["rows"])
+    row_counts.sort(key=int)
+
     for metric in metrics:
         subset = [row for row in rows if row["metric"] == metric]
-        unit = subset[0]["unit"]
-        series = []
-        labels = []
-        for uuid_type in ("v7", "v4"):
-            values = [float(row["value"]) for row in subset if row["type"] == uuid_type]
-            series.append(values)
-            labels.append(uuid_type)
+        width = 0.35
+        positions = list(range(len(row_counts)))
+        labeled_values = []
 
-        figure, axes = plt.subplots()
-        axes.hist(series, bins=HISTOGRAM_BINS, label=labels, alpha=0.6)
+        figure, axes = plt.subplots(layout="constrained")
+        for offset, uuid_type in ((-width / 2, "v7"), (width / 2, "v4")):
+            by_rows = {
+                row["rows"]: float(row["value"])
+                for row in subset
+                if row["type"] == uuid_type
+            }
+            values = [display_value(metric, by_rows[count]) for count in row_counts]
+            labeled_values.extend(values)
+            bars = axes.bar(
+                [position + offset for position in positions],
+                values,
+                width,
+                label=uuid_type,
+            )
+            axes.bar_label(bars, labels=[f"{value:.1f}" for value in values], padding=3)
+
+        axes.set_xticks(
+            positions,
+            [format_row_count(count) for count in row_counts],
+        )
+        axes.set_ylim(0, max(labeled_values) * 1.15)
         axes.set_title(metric)
-        axes.set_xlabel(unit)
-        axes.set_ylabel("count")
-        axes.legend()
+        axes.set_xlabel("rows")
+        axes.set_ylabel(display_unit(metric))
+        axes.legend(loc="upper left")
         figure.savefig(stats_path.with_name(f"{metric}_histogram.png"))
 
     plt.show()
@@ -136,7 +178,7 @@ def plot_histograms(stats_path):
 def main():
     with connect() as conn:
         run_benchmark(conn, ROW_COUNTS, STATS_PATH)
-    plot_histograms(STATS_PATH)
+    plot_charts(STATS_PATH)
 
 
 if __name__ == "__main__":
