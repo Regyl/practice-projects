@@ -1,0 +1,8 @@
+- 1 000 000
+  - v7
+    - insert took: 3256.228
+    - index size: 30MB
+  - v4
+    - insert took: 3256.228
+    - index size: 30MB
+- 10 000 000
