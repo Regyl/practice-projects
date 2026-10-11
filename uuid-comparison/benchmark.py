@@ -1,7 +1,5 @@
 import csv
-import json
 import os
-import statistics
 import time
 from pathlib import Path
 
@@ -13,7 +11,6 @@ ROOT = Path(__file__).resolve().parent
 STATS_PATH = ROOT / "statistics.csv"
 
 ROW_COUNTS = (1_000_000, 10_000_000, 100_000_000, 1_000_000_000)
-LOOKUP_REPEATS = 11
 HISTOGRAM_BINS = 10
 
 VARIANTS = (
@@ -66,35 +63,6 @@ def index_size_bytes(conn, variant):
     return int(row[0])
 
 
-def capture_id(conn, variant):
-    sampled = sql.SQL("SELECT id FROM {} TABLESAMPLE SYSTEM (1) LIMIT 1").format(
-        variant["table"]
-    )
-    row = conn.execute(sampled).fetchone()
-    if row is None:
-        fallback = sql.SQL("SELECT id FROM {} LIMIT 1").format(variant["table"])
-        row = conn.execute(fallback).fetchone()
-    if row is None:
-        raise RuntimeError(f"no id found in {variant['type']} table after insert")
-    return row[0]
-
-
-def lookup_time_ms(conn, variant, lookup_id):
-    statement = sql.SQL("SELECT * FROM {} WHERE id = %s").format(variant["table"])
-    conn.execute(statement, (lookup_id,)).fetchone()
-
-    explain = sql.SQL(
-        "EXPLAIN (ANALYZE, FORMAT JSON) SELECT * FROM {} WHERE id = %s"
-    ).format(variant["table"])
-    samples = []
-    for _ in range(LOOKUP_REPEATS):
-        document = conn.execute(explain, (lookup_id,)).fetchone()[0]
-        if isinstance(document, str):
-            document = json.loads(document)
-        samples.append(float(document[0]["Execution Time"]))
-    return statistics.median(samples)
-
-
 def format_value(metric, value):
     if metric == "index_size":
         return str(int(value))
@@ -132,12 +100,6 @@ def run_benchmark(conn, row_counts, stats_path):
                     "index_size",
                     size_bytes,
                     "bytes",
-                )
-
-                lookup_id = capture_id(conn, variant)
-                lookup_ms = lookup_time_ms(conn, variant, lookup_id)
-                write_metric(
-                    stats_file, writer, row_count, variant["type"], "lookup", lookup_ms, "ms"
                 )
 
 
