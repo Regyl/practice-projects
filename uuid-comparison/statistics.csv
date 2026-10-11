@@ -1,0 +1,13 @@
+rows,type,metric,value,unit
+1000000,v7,insert,2583.441,ms
+1000000,v7,index_size,31563776,bytes
+1000000,v4,insert,3757.897,ms
+1000000,v4,index_size,39559168,bytes
+10000000,v7,insert,22387.639,ms
+10000000,v7,index_size,315432960,bytes
+10000000,v4,insert,67886.248,ms
+10000000,v4,index_size,406978560,bytes
+100000000,v7,insert,250150.790,ms
+100000000,v7,index_size,3154173952,bytes
+100000000,v4,insert,2437385.403,ms
+100000000,v4,index_size,4154957824,bytes
