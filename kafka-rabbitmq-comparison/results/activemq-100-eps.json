@@ -1,0 +1,15 @@
+{
+  "broker" : "activemq",
+  "targetEps" : 100,
+  "achievedPublishEps" : 100.0,
+  "achievedConsumeEps" : 100.0,
+  "sentCount" : 6000,
+  "receivedCount" : 6000,
+  "minMicros" : 558,
+  "meanMicros" : 1173.844,
+  "p50Micros" : 807,
+  "p95Micros" : 2839,
+  "p99Micros" : 8391,
+  "p999Micros" : 27663,
+  "maxMicros" : 33919
+}

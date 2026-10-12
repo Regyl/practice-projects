@@ -1,0 +1,15 @@
+{
+  "broker" : "redis",
+  "targetEps" : 5000,
+  "achievedPublishEps" : 5000.0,
+  "achievedConsumeEps" : 5000.0,
+  "sentCount" : 300000,
+  "receivedCount" : 300000,
+  "minMicros" : 361,
+  "meanMicros" : 501.01170333333334,
+  "p50Micros" : 450,
+  "p95Micros" : 665,
+  "p99Micros" : 1180,
+  "p999Micros" : 6051,
+  "maxMicros" : 54527
+}

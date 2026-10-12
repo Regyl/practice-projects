@@ -1,0 +1,15 @@
+{
+  "broker" : "rabbitmq",
+  "targetEps" : 10000,
+  "achievedPublishEps" : 10000.0,
+  "achievedConsumeEps" : 10000.0,
+  "sentCount" : 600000,
+  "receivedCount" : 600000,
+  "minMicros" : 457,
+  "meanMicros" : 1942.1806166666668,
+  "p50Micros" : 927,
+  "p95Micros" : 2361,
+  "p99Micros" : 32383,
+  "p999Micros" : 122175,
+  "maxMicros" : 132735
+}

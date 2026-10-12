@@ -1,0 +1,15 @@
+{
+  "broker" : "kafka",
+  "targetEps" : 100,
+  "achievedPublishEps" : 100.0,
+  "achievedConsumeEps" : 100.0,
+  "sentCount" : 6000,
+  "receivedCount" : 6000,
+  "minMicros" : 1996,
+  "meanMicros" : 3427081.441,
+  "p50Micros" : 6403,
+  "p95Micros" : 17268735,
+  "p99Micros" : 19660799,
+  "p999Micros" : 20201471,
+  "maxMicros" : 20250623
+}
