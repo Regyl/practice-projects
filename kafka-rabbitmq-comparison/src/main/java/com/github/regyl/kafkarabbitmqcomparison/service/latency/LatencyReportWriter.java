@@ -3,6 +3,7 @@ package com.github.regyl.kafkarabbitmqcomparison.service.latency;
 import com.github.regyl.kafkarabbitmqcomparison.configuration.BenchmarkProperties;
 import com.github.regyl.kafkarabbitmqcomparison.model.LatencyReportModel;
 import com.github.regyl.kafkarabbitmqcomparison.util.FormatUtils;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,35 +12,20 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.function.Supplier;
 
 @Component
+@RequiredArgsConstructor
 public class LatencyReportWriter {
 
     private static final Logger log = LoggerFactory.getLogger(LatencyReportWriter.class);
-    private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm-ss");
 
     private final BenchmarkProperties properties;
     private final JsonMapper jsonMapper;
-    private final Supplier<OffsetDateTime> offsetDateTimeSupplier;
 
-    public LatencyReportWriter(
-            BenchmarkProperties properties,
-            JsonMapper jsonMapper,
-            Supplier<OffsetDateTime> offsetDateTimeSupplier
-    ) {
-        this.properties = properties;
-        this.jsonMapper = jsonMapper;
-        this.offsetDateTimeSupplier = offsetDateTimeSupplier;
-    }
-
-    public Path write(LatencyReportModel report) throws IOException {
+    public void write(LatencyReportModel report) throws IOException {
         Path directory = Path.of(properties.resultsDir());
         Files.createDirectories(directory);
-        String timestamp = TIMESTAMP.format(offsetDateTimeSupplier.get());
-        Path file = directory.resolve(report.broker() + "-" + report.targetEps() + "eps-" + timestamp + ".json");
+        Path file = directory.resolve(report.broker() + "-" + report.targetEps() + "eps.json");
         jsonMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), report);
         log.info("Wrote latency report to {}", file.toAbsolutePath());
         log.info(
@@ -59,6 +45,5 @@ public class LatencyReportWriter {
                 report.p999Micros(),
                 report.maxMicros()
         );
-        return file;
     }
 }

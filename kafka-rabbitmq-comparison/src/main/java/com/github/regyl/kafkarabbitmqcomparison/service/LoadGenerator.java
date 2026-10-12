@@ -7,12 +7,15 @@ import com.github.regyl.kafkarabbitmqcomparison.configuration.BenchmarkPropertie
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyRecorder;
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyReportWriter;
 import com.github.regyl.kafkarabbitmqcomparison.util.SleepUtil;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Component
-@ConditionalOnProperty(prefix = "benchmark", name = "enabled", havingValue = "true")
+@RequiredArgsConstructor
 public class LoadGenerator implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(LoadGenerator.class);
@@ -39,21 +42,10 @@ public class LoadGenerator implements ApplicationRunner {
     private final LatencyReportWriter reportWriter;
     private final KafkaTemplate<String, AuthCodeMessageModel> kafkaTemplate;
     private final RabbitTemplate rabbitTemplate;
+    @Qualifier("authCodeRedisTemplate")
+    private final RedisTemplate<String, AuthCodeMessageModel> authCodeRedisTemplate;
     private final AtomicBoolean sendFailureLogged = new AtomicBoolean();
-
-    public LoadGenerator(
-            BenchmarkProperties properties,
-            LatencyRecorder latencyRecorder,
-            LatencyReportWriter reportWriter,
-            KafkaTemplate<String, AuthCodeMessageModel> kafkaTemplate,
-            RabbitTemplate rabbitTemplate
-    ) {
-        this.properties = properties;
-        this.latencyRecorder = latencyRecorder;
-        this.reportWriter = reportWriter;
-        this.kafkaTemplate = kafkaTemplate;
-        this.rabbitTemplate = rabbitTemplate;
-    }
+    private final ShutdownService shutdownService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -61,12 +53,12 @@ public class LoadGenerator implements ApplicationRunner {
             runOne(broker);
         }
         log.info("Benchmark finished. Reports are in {}", properties.resultsDir());
-        System.exit(1);
+        shutdownService.shutdown(1);
     }
 
     private List<Broker> selectedBrokers() {
         if (properties.broker() == Broker.ALL) {
-            return List.of(Broker.KAFKA, Broker.RABBITMQ);
+            return List.of(Broker.KAFKA, Broker.RABBITMQ, Broker.REDIS);
         }
         return List.of(properties.broker());
     }
@@ -176,7 +168,8 @@ public class LoadGenerator implements ApplicationRunner {
         switch (broker) {
             case KAFKA -> publishKafka(message, warmup, inFlight);
             case RABBITMQ -> publishRabbit(message, warmup, inFlight);
-            case ALL -> throw new IllegalStateException("A single run must target kafka or rabbitmq");
+            case REDIS -> publishRedis(message, warmup, inFlight);
+            case ALL -> throw new IllegalStateException("A single run must target kafka, rabbitmq, or redis");
             default -> throw new IllegalStateException("Unexpected broker: " + broker);
         }
     }
@@ -209,6 +202,25 @@ public class LoadGenerator implements ApplicationRunner {
                 latencyRecorder.recordSendFailure(Broker.RABBITMQ);
             }
             logSendFailure(Broker.RABBITMQ, ex);
+        } finally {
+            inFlight.release();
+        }
+    }
+
+    private void publishRedis(AuthCodeMessageModel message, boolean warmup, Semaphore inFlight) {
+        try {
+            Long receivers = authCodeRedisTemplate.convertAndSend(MessagingNamesConstant.CHANNEL, message);
+            if (receivers == null || receivers == 0) {
+                if (!warmup) {
+                    latencyRecorder.recordSendFailure(Broker.REDIS);
+                }
+                logSendFailure(Broker.REDIS, new IllegalStateException("Redis publish reached no subscribers"));
+            }
+        } catch (RuntimeException ex) {
+            if (!warmup) {
+                latencyRecorder.recordSendFailure(Broker.REDIS);
+            }
+            logSendFailure(Broker.REDIS, ex);
         } finally {
             inFlight.release();
         }

@@ -8,7 +8,6 @@ import java.time.Duration;
 
 @ConfigurationProperties(prefix = "benchmark")
 public record BenchmarkProperties(
-        boolean enabled,
         Broker broker,
         long eventsPerSecond,
         Duration duration,

@@ -4,6 +4,7 @@ public enum Broker {
 
     KAFKA("kafka"),
     RABBITMQ("rabbitmq"),
+    REDIS("redis"),
     ALL("all");
 
     private final String wireName;

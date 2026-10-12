@@ -1,23 +1,23 @@
-package com.github.regyl.kafkarabbitmqcomparison.service.consume;
+package com.github.regyl.kafkarabbitmqcomparison.service.consumer;
 
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyRecorder;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthCodeRabbitListener {
+public class KafkaMqListener {
 
     private final LatencyRecorder latencyRecorder;
 
-    public AuthCodeRabbitListener(LatencyRecorder latencyRecorder) {
+    public KafkaMqListener(LatencyRecorder latencyRecorder) {
         this.latencyRecorder = latencyRecorder;
     }
 
-    @RabbitListener(queues = MessagingNamesConstant.QUEUE)
+    @KafkaListener(topics = MessagingNamesConstant.TOPIC)
     public void onMessage(AuthCodeMessageModel message) {
-        latencyRecorder.record(Broker.RABBITMQ, message);
+        latencyRecorder.record(Broker.KAFKA, message);
     }
 }

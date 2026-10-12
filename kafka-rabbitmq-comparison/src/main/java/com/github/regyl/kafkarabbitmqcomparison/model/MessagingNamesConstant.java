@@ -10,6 +10,7 @@ public final class MessagingNamesConstant {
     public static final String EXCHANGE = "auth.exchange";
     public static final String QUEUE = "auth.codes";
     public static final String ROUTING_KEY = "auth.codes";
+    public static final String CHANNEL = "auth.codes";
 
     public static final int TOPIC_PARTITIONS = 12;
 }

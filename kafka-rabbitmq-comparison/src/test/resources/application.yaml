@@ -9,6 +9,10 @@ spring:
     listener:
       simple:
         auto-startup: false
+  data:
+    redis:
+      listener:
+        auto-startup: false
 
 benchmark:
   enabled: false

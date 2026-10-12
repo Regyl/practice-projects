@@ -1,6 +1,5 @@
 benchmark:
-  enabled: true
-  broker: all #kafka|rabbitmq|all
+  broker: all #kafka|rabbitmq|redis|all
   events-per-second: 1000
   duration: 60s
   warmup: 10s
@@ -43,6 +42,10 @@ spring:
     listener:
       simple:
         concurrency: ${benchmark.listener-concurrency}
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 logging:
   level:
