@@ -1,6 +1,10 @@
 package com.github.regyl.kafkarabbitmqcomparison.model;
 
-public final class MessagingNames {
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class MessagingNamesConstant {
 
     public static final String TOPIC = "auth.codes";
     public static final String EXCHANGE = "auth.exchange";
@@ -8,7 +12,4 @@ public final class MessagingNames {
     public static final String ROUTING_KEY = "auth.codes";
 
     public static final int TOPIC_PARTITIONS = 12;
-
-    private MessagingNames() {
-    }
 }

@@ -1,7 +1,8 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.latency;
 
-import com.github.regyl.kafkarabbitmqcomparison.model.LatencyReport;
 import com.github.regyl.kafkarabbitmqcomparison.configuration.BenchmarkProperties;
+import com.github.regyl.kafkarabbitmqcomparison.model.LatencyReportModel;
+import com.github.regyl.kafkarabbitmqcomparison.util.FormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -10,9 +11,9 @@ import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
+import java.util.function.Supplier;
 
 @Component
 public class LatencyReportWriter {
@@ -22,29 +23,36 @@ public class LatencyReportWriter {
 
     private final BenchmarkProperties properties;
     private final JsonMapper jsonMapper;
+    private final Supplier<OffsetDateTime> offsetDateTimeSupplier;
 
-    public LatencyReportWriter(BenchmarkProperties properties, JsonMapper jsonMapper) {
+    public LatencyReportWriter(
+            BenchmarkProperties properties,
+            JsonMapper jsonMapper,
+            Supplier<OffsetDateTime> offsetDateTimeSupplier
+    ) {
         this.properties = properties;
         this.jsonMapper = jsonMapper;
+        this.offsetDateTimeSupplier = offsetDateTimeSupplier;
     }
 
-    public Path write(LatencyReport report) throws IOException {
+    public Path write(LatencyReportModel report) throws IOException {
         Path directory = Path.of(properties.resultsDir());
         Files.createDirectories(directory);
-        String timestamp = TIMESTAMP.format(LocalDateTime.now());
+        String timestamp = TIMESTAMP.format(offsetDateTimeSupplier.get());
         Path file = directory.resolve(report.broker() + "-" + report.targetEps() + "eps-" + timestamp + ".json");
         jsonMapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), report);
         log.info("Wrote latency report to {}", file.toAbsolutePath());
         log.info(
-                "{} targetEps={} publishEps={} consumeEps={} sent={} received={} min={}us mean={}us p50={}us p95={}us p99={}us p999={}us max={}us",
+                "{} targetEps={} publishEps={} consumeEps={} sent={} received={}"
+                        + " min={}us mean={}us p50={}us p95={}us p99={}us p999={}us max={}us",
                 report.broker(),
                 report.targetEps(),
-                format(report.achievedPublishEps()),
-                format(report.achievedConsumeEps()),
+                FormatUtils.format(report.achievedPublishEps()),
+                FormatUtils.format(report.achievedConsumeEps()),
                 report.sentCount(),
                 report.receivedCount(),
                 report.minMicros(),
-                format(report.meanMicros()),
+                FormatUtils.format(report.meanMicros()),
                 report.p50Micros(),
                 report.p95Micros(),
                 report.p99Micros(),
@@ -52,9 +60,5 @@ public class LatencyReportWriter {
                 report.maxMicros()
         );
         return file;
-    }
-
-    private static String format(double value) {
-        return String.format(Locale.ROOT, "%.1f", value);
     }
 }

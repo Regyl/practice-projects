@@ -1,11 +1,12 @@
 package com.github.regyl.kafkarabbitmqcomparison.service;
 
-import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessage;
+import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
-import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNames;
+import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
 import com.github.regyl.kafkarabbitmqcomparison.configuration.BenchmarkProperties;
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyRecorder;
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyReportWriter;
+import com.github.regyl.kafkarabbitmqcomparison.util.SleepUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -36,7 +37,7 @@ public class LoadGenerator implements ApplicationRunner {
     private final BenchmarkProperties properties;
     private final LatencyRecorder latencyRecorder;
     private final LatencyReportWriter reportWriter;
-    private final KafkaTemplate<String, AuthCodeMessage> kafkaTemplate;
+    private final KafkaTemplate<String, AuthCodeMessageModel> kafkaTemplate;
     private final RabbitTemplate rabbitTemplate;
     private final AtomicBoolean sendFailureLogged = new AtomicBoolean();
 
@@ -44,7 +45,7 @@ public class LoadGenerator implements ApplicationRunner {
             BenchmarkProperties properties,
             LatencyRecorder latencyRecorder,
             LatencyReportWriter reportWriter,
-            KafkaTemplate<String, AuthCodeMessage> kafkaTemplate,
+            KafkaTemplate<String, AuthCodeMessageModel> kafkaTemplate,
             RabbitTemplate rabbitTemplate
     ) {
         this.properties = properties;
@@ -156,7 +157,7 @@ public class LoadGenerator implements ApplicationRunner {
             if (targetNanos >= endNanos) {
                 return;
             }
-            sleepUntil(targetNanos);
+            SleepUtil.sleepUntil(targetNanos);
             inFlight.acquire();
             boolean warmup = targetNanos < measureStartNanos;
             publish(broker, warmup, inFlight);
@@ -171,17 +172,18 @@ public class LoadGenerator implements ApplicationRunner {
             latencyRecorder.recordSent(broker);
         }
         long sentAtNanos = System.nanoTime();
-        AuthCodeMessage message = new AuthCodeMessage(id, email, code, sentAtNanos, warmup);
+        AuthCodeMessageModel message = new AuthCodeMessageModel(id, email, code, sentAtNanos, warmup);
         switch (broker) {
             case KAFKA -> publishKafka(message, warmup, inFlight);
             case RABBITMQ -> publishRabbit(message, warmup, inFlight);
             case ALL -> throw new IllegalStateException("A single run must target kafka or rabbitmq");
+            default -> throw new IllegalStateException("Unexpected broker: " + broker);
         }
     }
 
-    private void publishKafka(AuthCodeMessage message, boolean warmup, Semaphore inFlight) {
+    private void publishKafka(AuthCodeMessageModel message, boolean warmup, Semaphore inFlight) {
         try {
-            kafkaTemplate.send(MessagingNames.TOPIC, message.id(), message).whenComplete((result, error) -> {
+            kafkaTemplate.send(MessagingNamesConstant.TOPIC, message.id(), message).whenComplete((result, error) -> {
                 inFlight.release();
                 if (error != null) {
                     if (!message.warmup()) {
@@ -199,9 +201,9 @@ public class LoadGenerator implements ApplicationRunner {
         }
     }
 
-    private void publishRabbit(AuthCodeMessage message, boolean warmup, Semaphore inFlight) {
+    private void publishRabbit(AuthCodeMessageModel message, boolean warmup, Semaphore inFlight) {
         try {
-            rabbitTemplate.convertAndSend(MessagingNames.EXCHANGE, MessagingNames.ROUTING_KEY, message);
+            rabbitTemplate.convertAndSend(MessagingNamesConstant.EXCHANGE, MessagingNamesConstant.ROUTING_KEY, message);
         } catch (RuntimeException ex) {
             if (!warmup) {
                 latencyRecorder.recordSendFailure(Broker.RABBITMQ);
@@ -228,11 +230,11 @@ public class LoadGenerator implements ApplicationRunner {
     private void purgeRabbitQueue() {
         try {
             rabbitTemplate.execute(channel -> {
-                channel.queuePurge(MessagingNames.QUEUE);
+                channel.queuePurge(MessagingNamesConstant.QUEUE);
                 return null;
             });
         } catch (RuntimeException ex) {
-            log.warn("Could not purge RabbitMQ queue {} before the run", MessagingNames.QUEUE, ex);
+            log.warn("Could not purge RabbitMQ queue {} before the run", MessagingNamesConstant.QUEUE, ex);
         }
     }
 
@@ -252,20 +254,6 @@ public class LoadGenerator implements ApplicationRunner {
     private void logSendFailure(Broker broker, Throwable error) {
         if (sendFailureLogged.compareAndSet(false, true)) {
             log.warn("Failed to publish to {}", broker.wireName(), error);
-        }
-    }
-
-    private static void sleepUntil(long targetNanos) throws InterruptedException {
-        long remaining;
-        while ((remaining = targetNanos - System.nanoTime()) > 0) {
-            if (Thread.currentThread().isInterrupted()) {
-                throw new InterruptedException();
-            }
-            if (remaining > 2_000_000L) {
-                Thread.sleep(Math.min(remaining / 1_000_000L - 1, 50));
-            } else {
-                Thread.onSpinWait();
-            }
         }
     }
 }

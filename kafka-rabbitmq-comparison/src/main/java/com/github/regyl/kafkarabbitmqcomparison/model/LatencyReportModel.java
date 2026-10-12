@@ -1,6 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.model;
 
-public record LatencyReport(
+public record LatencyReportModel(
         String broker,
         long targetEps,
         double achievedPublishEps,

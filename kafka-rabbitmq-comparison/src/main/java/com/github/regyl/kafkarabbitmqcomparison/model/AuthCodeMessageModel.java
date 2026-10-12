@@ -1,6 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.model;
 
-public record AuthCodeMessage(
+public record AuthCodeMessageModel(
         String id,
         String email,
         String code,

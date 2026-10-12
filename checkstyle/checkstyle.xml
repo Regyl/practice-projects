@@ -31,7 +31,7 @@
     </module>
     <module name="RegexpSingleline">
         <property name="format" value="\.now\(\)"/>
-        <property name="message" value="Calling DateTime.now() is forbidden. Use supplier"/>
+        <property name="message" value="Calling DateTime.now() is forbidden. Use supplier from DateTimeSupplierFactory"/>
     </module>
     <module name="RegexpSingleline">
         <property name="format" value="[A-Za-z]+ != null &amp;&amp; ![A-Za-z]+\.(isBlank|isEmpty)\(\)"/>

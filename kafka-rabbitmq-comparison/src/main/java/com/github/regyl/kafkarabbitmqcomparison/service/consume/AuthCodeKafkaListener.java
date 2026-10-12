@@ -1,8 +1,8 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.consume;
 
-import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessage;
+import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
-import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNames;
+import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyRecorder;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -16,8 +16,8 @@ public class AuthCodeKafkaListener {
         this.latencyRecorder = latencyRecorder;
     }
 
-    @KafkaListener(topics = MessagingNames.TOPIC)
-    public void onMessage(AuthCodeMessage message) {
+    @KafkaListener(topics = MessagingNamesConstant.TOPIC)
+    public void onMessage(AuthCodeMessageModel message) {
         latencyRecorder.record(Broker.KAFKA, message);
     }
 }

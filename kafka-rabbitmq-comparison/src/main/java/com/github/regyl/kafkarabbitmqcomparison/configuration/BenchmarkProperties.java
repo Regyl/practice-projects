@@ -2,6 +2,7 @@ package com.github.regyl.kafkarabbitmqcomparison.configuration;
 
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 
@@ -40,7 +41,7 @@ public record BenchmarkProperties(
         if (maxInFlight <= 0) {
             maxInFlight = 50_000;
         }
-        if (resultsDir == null || resultsDir.isBlank()) {
+        if (!StringUtils.hasLength(resultsDir)) {
             resultsDir = "results";
         }
     }

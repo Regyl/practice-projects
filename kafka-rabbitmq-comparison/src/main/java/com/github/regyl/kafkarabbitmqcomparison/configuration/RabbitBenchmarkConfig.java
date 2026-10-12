@@ -1,6 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.configuration;
 
-import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNames;
+import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -18,17 +18,17 @@ public class RabbitBenchmarkConfig {
 
     @Bean
     DirectExchange authExchange() {
-        return new DirectExchange(MessagingNames.EXCHANGE, true, false);
+        return new DirectExchange(MessagingNamesConstant.EXCHANGE, true, false);
     }
 
     @Bean
     Queue authQueue() {
-        return QueueBuilder.durable(MessagingNames.QUEUE).build();
+        return QueueBuilder.durable(MessagingNamesConstant.QUEUE).build();
     }
 
     @Bean
     Binding authBinding(Queue authQueue, DirectExchange authExchange) {
-        return BindingBuilder.bind(authQueue).to(authExchange).with(MessagingNames.ROUTING_KEY);
+        return BindingBuilder.bind(authQueue).to(authExchange).with(MessagingNamesConstant.ROUTING_KEY);
     }
 
     @Bean

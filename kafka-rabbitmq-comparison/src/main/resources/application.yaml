@@ -29,7 +29,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
       properties:
         spring.json.trusted.packages: '*'
-        spring.json.value.default.type: com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessage
+        spring.json.value.default.type: com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel
     listener:
       concurrency: ${benchmark.listener-concurrency}
       missing-topics-fatal: false

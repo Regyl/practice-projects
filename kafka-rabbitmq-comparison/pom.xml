@@ -10,9 +10,10 @@
     </parent>
     <groupId>com.github.regyl</groupId>
     <artifactId>kafka-rabbitmq-comparison</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <properties>
+        <hdr-diagram.version>2.2.2</hdr-diagram.version>
         <!--tests-->
         <archunit.version>1.4.1</archunit.version>
 
@@ -41,7 +42,7 @@
         <dependency>
             <groupId>org.hdrhistogram</groupId>
             <artifactId>HdrHistogram</artifactId>
-            <version>2.2.2</version>
+            <version>${hdr-diagram.version}</version>
         </dependency>
 
         <dependency>

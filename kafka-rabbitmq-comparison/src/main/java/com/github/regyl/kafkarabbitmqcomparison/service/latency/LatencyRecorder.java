@@ -1,8 +1,8 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.latency;
 
-import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessage;
+import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
-import com.github.regyl.kafkarabbitmqcomparison.model.LatencyReport;
+import com.github.regyl.kafkarabbitmqcomparison.model.LatencyReportModel;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.Recorder;
 import org.springframework.stereotype.Component;
@@ -36,7 +36,7 @@ public class LatencyRecorder {
         sentCounter(broker).decrement();
     }
 
-    public void record(Broker broker, AuthCodeMessage message) {
+    public void record(Broker broker, AuthCodeMessageModel message) {
         if (message.warmup()) {
             return;
         }
@@ -57,7 +57,7 @@ public class LatencyRecorder {
         return receivedCounter(broker).sum();
     }
 
-    public LatencyReport report(Broker broker, long targetEps, Duration duration) {
+    public LatencyReportModel report(Broker broker, long targetEps, Duration duration) {
         Histogram histogram = histogram(broker).getIntervalHistogram();
         long sent = sentCounter(broker).sum();
         long received = receivedCounter(broker).sum();
@@ -65,7 +65,7 @@ public class LatencyRecorder {
         if (histogram.getTotalCount() == 0) {
             return empty(broker, targetEps, sent, received, seconds);
         }
-        return new LatencyReport(
+        return new LatencyReportModel(
                 broker.wireName(),
                 targetEps,
                 sent / seconds,
@@ -82,8 +82,8 @@ public class LatencyRecorder {
         );
     }
 
-    private static LatencyReport empty(Broker broker, long targetEps, long sent, long received, double seconds) {
-        return new LatencyReport(
+    private LatencyReportModel empty(Broker broker, long targetEps, long sent, long received, double seconds) {
+        return new LatencyReportModel(
                 broker.wireName(),
                 targetEps,
                 sent / seconds,
@@ -112,7 +112,7 @@ public class LatencyRecorder {
         return receivedCounts.computeIfAbsent(broker, ignored -> new LongAdder());
     }
 
-    private static long clampMicros(long latencyMicros) {
+    private long clampMicros(long latencyMicros) {
         if (latencyMicros < 1) {
             return 1;
         }
