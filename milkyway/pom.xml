@@ -22,17 +22,10 @@
     <modules>
         <module>../rsa-aes</module>
         <module>../streams</module>
-        <module>../concurrency-password-hacker</module>
         <module>../algorithms</module>
-        <module>../palindrome</module>
         <module>../thread-local</module>
-        <module>../concurrency</module>
-        <module>../concurrently-text-searcher</module>
-        <module>../cbr</module>
-        <module>../mybatis-sql-formatter</module>
         <module>../weld-demo</module>
         <module>../leetcode-templates</module>
-        <module>../autoru-history-statistic</module>
         <module>../flink-example</module>
     </modules>
 

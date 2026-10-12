@@ -8,7 +8,7 @@ import org.springframework.data.redis.annotation.RedisListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RedisMqListener {
+public class RedisMqListener implements MqListener {
 
     private final LatencyRecorder latencyRecorder;
 
@@ -16,6 +16,7 @@ public class RedisMqListener {
         this.latencyRecorder = latencyRecorder;
     }
 
+    @Override
     @RedisListener(topic = MessagingNamesConstant.CHANNEL, consumes = "application/json")
     public void onMessage(AuthCodeMessageModel message) {
         latencyRecorder.record(Broker.REDIS, message);

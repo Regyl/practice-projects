@@ -60,3 +60,20 @@ services:
       timeout: 10s
       retries: 12
       start_period: 5s
+
+  activemq:
+    image: apache/activemq-classic:6.2.0
+    hostname: activemq
+    container_name: activemq
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    environment:
+      ACTIVEMQ_CONNECTION_USER: admin
+      ACTIVEMQ_CONNECTION_PASSWORD: admin
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/61616'"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 20s

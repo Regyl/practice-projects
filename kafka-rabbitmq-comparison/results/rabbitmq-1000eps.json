@@ -5,11 +5,11 @@
   "achievedConsumeEps" : 1000.0,
   "sentCount" : 60000,
   "receivedCount" : 60000,
-  "minMicros" : 759,
-  "meanMicros" : 1691.0001,
-  "p50Micros" : 1572,
-  "p95Micros" : 2665,
-  "p99Micros" : 3569,
-  "p999Micros" : 5755,
-  "maxMicros" : 12399
+  "minMicros" : 697,
+  "meanMicros" : 1564.9687,
+  "p50Micros" : 1460,
+  "p95Micros" : 2463,
+  "p99Micros" : 3463,
+  "p999Micros" : 7087,
+  "maxMicros" : 28287
 }

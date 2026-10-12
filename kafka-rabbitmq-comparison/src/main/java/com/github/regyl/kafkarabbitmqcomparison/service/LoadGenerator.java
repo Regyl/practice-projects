@@ -7,6 +7,9 @@ import com.github.regyl.kafkarabbitmqcomparison.configuration.BenchmarkPropertie
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyRecorder;
 import com.github.regyl.kafkarabbitmqcomparison.service.latency.LatencyReportWriter;
 import com.github.regyl.kafkarabbitmqcomparison.util.SleepUtil;
+import jakarta.jms.Message;
+import jakarta.jms.MessageConsumer;
+import jakarta.jms.Queue;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +17,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +47,7 @@ public class LoadGenerator implements ApplicationRunner {
     private final RabbitTemplate rabbitTemplate;
     @Qualifier("authCodeRedisTemplate")
     private final RedisTemplate<String, AuthCodeMessageModel> authCodeRedisTemplate;
+    private final JmsTemplate jmsTemplate;
     private final AtomicBoolean sendFailureLogged = new AtomicBoolean();
     private final ShutdownService shutdownService;
 
@@ -58,7 +62,7 @@ public class LoadGenerator implements ApplicationRunner {
 
     private List<Broker> selectedBrokers() {
         if (properties.broker() == Broker.ALL) {
-            return List.of(Broker.KAFKA, Broker.RABBITMQ, Broker.REDIS);
+            return List.of(Broker.KAFKA, Broker.RABBITMQ, Broker.REDIS, Broker.ACTIVEMQ);
         }
         return List.of(properties.broker());
     }
@@ -68,10 +72,13 @@ public class LoadGenerator implements ApplicationRunner {
         if (broker == Broker.RABBITMQ) {
             purgeRabbitQueue();
         }
+        if (broker == Broker.ACTIVEMQ) {
+            purgeActiveMqQueue();
+        }
         latencyRecorder.begin(broker);
         log.info(
                 "Starting {} benchmark at {} events/sec for {} after {} warmup",
-                broker.wireName(),
+                broker.getWireName(),
                 properties.eventsPerSecond(),
                 properties.duration(),
                 properties.warmup()
@@ -85,7 +92,7 @@ public class LoadGenerator implements ApplicationRunner {
         AtomicLong nextSlot = new AtomicLong();
         int threads = properties.publisherThreads();
         ExecutorService workers = Executors.newFixedThreadPool(threads, runnable -> {
-            Thread thread = new Thread(runnable, "benchmark-publisher-" + broker.wireName());
+            Thread thread = new Thread(runnable, "benchmark-publisher-" + broker.getWireName());
             thread.setDaemon(true);
             return thread;
         });
@@ -109,9 +116,9 @@ public class LoadGenerator implements ApplicationRunner {
                         publishLoop(broker, intervalNanos, startNanos, measureStartNanos, endNanos, nextSlot, inFlight);
                     } catch (InterruptedException ex) {
                         Thread.currentThread().interrupt();
-                        log.warn("Publisher thread interrupted for {}", broker.wireName());
+                        log.warn("Publisher thread interrupted for {}", broker.getWireName());
                     } catch (RuntimeException ex) {
-                        log.error("Publisher thread failed for {}", broker.wireName(), ex);
+                        log.error("Publisher thread failed for {}", broker.getWireName(), ex);
                     } finally {
                         finished.countDown();
                     }
@@ -123,7 +130,7 @@ public class LoadGenerator implements ApplicationRunner {
                     .plusSeconds(120)
                     .toSeconds();
             if (!finished.await(awaitSeconds, TimeUnit.SECONDS)) {
-                log.warn("Publishers did not finish in time for {}", broker.wireName());
+                log.warn("Publishers did not finish in time for {}", broker.getWireName());
             }
             drain(broker);
         } finally {
@@ -169,7 +176,8 @@ public class LoadGenerator implements ApplicationRunner {
             case KAFKA -> publishKafka(message, warmup, inFlight);
             case RABBITMQ -> publishRabbit(message, warmup, inFlight);
             case REDIS -> publishRedis(message, warmup, inFlight);
-            case ALL -> throw new IllegalStateException("A single run must target kafka, rabbitmq, or redis");
+            case ACTIVEMQ -> publishActiveMq(message, warmup, inFlight);
+            case ALL -> throw new IllegalStateException("A single run must target kafka, rabbitmq, redis, or activemq");
             default -> throw new IllegalStateException("Unexpected broker: " + broker);
         }
     }
@@ -207,6 +215,19 @@ public class LoadGenerator implements ApplicationRunner {
         }
     }
 
+    private void publishActiveMq(AuthCodeMessageModel message, boolean warmup, Semaphore inFlight) {
+        try {
+            jmsTemplate.convertAndSend(MessagingNamesConstant.ACTIVEMQ_QUEUE, message);
+        } catch (RuntimeException ex) {
+            if (!warmup) {
+                latencyRecorder.recordSendFailure(Broker.ACTIVEMQ);
+            }
+            logSendFailure(Broker.ACTIVEMQ, ex);
+        } finally {
+            inFlight.release();
+        }
+    }
+
     private void publishRedis(AuthCodeMessageModel message, boolean warmup, Semaphore inFlight) {
         try {
             Long receivers = authCodeRedisTemplate.convertAndSend(MessagingNamesConstant.CHANNEL, message);
@@ -235,7 +256,28 @@ public class LoadGenerator implements ApplicationRunner {
         long received = latencyRecorder.receivedCount(broker);
         long sent = latencyRecorder.sentCount(broker);
         if (received < sent) {
-            log.warn("Drain timed out for {} with {} of {} measured messages received", broker.wireName(), received, sent);
+            log.warn("Drain timed out for {} with {} of {} measured messages received", broker.getWireName(), received, sent);
+        }
+    }
+
+    private void purgeActiveMqQueue() {
+        try {
+            jmsTemplate.execute(session -> {
+                Queue queue = session.createQueue(MessagingNamesConstant.ACTIVEMQ_QUEUE);
+                try (MessageConsumer consumer = session.createConsumer(queue)) {
+                    Message leftover = consumer.receiveNoWait();
+                    while (leftover != null) {
+                        leftover = consumer.receiveNoWait();
+                    }
+                }
+                return null;
+            }, true);
+        } catch (RuntimeException ex) {
+            log.warn(
+                    "Could not purge ActiveMQ queue {} before the run",
+                    MessagingNamesConstant.ACTIVEMQ_QUEUE,
+                    ex
+            );
         }
     }
 
@@ -254,7 +296,7 @@ public class LoadGenerator implements ApplicationRunner {
         try {
             log.info(
                     "{} progress sent={} received={}",
-                    broker.wireName(),
+                    broker.getWireName(),
                     latencyRecorder.sentCount(broker),
                     latencyRecorder.receivedCount(broker)
             );
@@ -265,7 +307,7 @@ public class LoadGenerator implements ApplicationRunner {
 
     private void logSendFailure(Broker broker, Throwable error) {
         if (sendFailureLogged.compareAndSet(false, true)) {
-            log.warn("Failed to publish to {}", broker.wireName(), error);
+            log.warn("Failed to publish to {}", broker.getWireName(), error);
         }
     }
 }

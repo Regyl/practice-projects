@@ -8,7 +8,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RabbitMqListener {
+public class RabbitMqListener implements MqListener {
 
     private final LatencyRecorder latencyRecorder;
 
@@ -16,6 +16,7 @@ public class RabbitMqListener {
         this.latencyRecorder = latencyRecorder;
     }
 
+    @Override
     @RabbitListener(queues = MessagingNamesConstant.QUEUE)
     public void onMessage(AuthCodeMessageModel message) {
         latencyRecorder.record(Broker.RABBITMQ, message);

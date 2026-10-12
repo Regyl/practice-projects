@@ -8,7 +8,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KafkaMqListener {
+public class KafkaMqListener implements MqListener {
 
     private final LatencyRecorder latencyRecorder;
 
@@ -16,6 +16,7 @@ public class KafkaMqListener {
         this.latencyRecorder = latencyRecorder;
     }
 
+    @Override
     @KafkaListener(topics = MessagingNamesConstant.TOPIC)
     public void onMessage(AuthCodeMessageModel message) {
         latencyRecorder.record(Broker.KAFKA, message);

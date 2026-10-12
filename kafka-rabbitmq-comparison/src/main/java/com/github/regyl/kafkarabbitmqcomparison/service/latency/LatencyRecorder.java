@@ -66,7 +66,7 @@ public class LatencyRecorder {
             return empty(broker, targetEps, sent, received, seconds);
         }
         return new LatencyReportModel(
-                broker.wireName(),
+                broker.getWireName(),
                 targetEps,
                 sent / seconds,
                 received / seconds,
@@ -84,7 +84,7 @@ public class LatencyRecorder {
 
     private LatencyReportModel empty(Broker broker, long targetEps, long sent, long received, double seconds) {
         return new LatencyReportModel(
-                broker.wireName(),
+                broker.getWireName(),
                 targetEps,
                 sent / seconds,
                 received / seconds,
