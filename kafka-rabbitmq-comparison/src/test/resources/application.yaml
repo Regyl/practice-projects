@@ -1,0 +1,14 @@
+spring:
+  kafka:
+    listener:
+      auto-startup: false
+    admin:
+      auto-create: false
+      fail-fast: false
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+
+benchmark:
+  enabled: false

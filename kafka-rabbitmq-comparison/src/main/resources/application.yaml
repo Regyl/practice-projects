@@ -1,0 +1,49 @@
+benchmark:
+  enabled: true
+  broker: all #kafka|rabbitmq|all
+  events-per-second: 1000
+  duration: 60s
+  warmup: 10s
+  drain-timeout: 30s
+  publisher-threads: 1
+  max-in-flight: 50000
+  results-dir: kafka-rabbitmq-comparison/results
+  listener-concurrency: 4
+
+spring:
+  application:
+    name: kafka-rabbitmq-comparison
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: 1
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        linger.ms: 5
+        enable.idempotence: false
+    consumer:
+      group-id: auth-codes
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+        spring.json.value.default.type: com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessage
+    listener:
+      concurrency: ${benchmark.listener-concurrency}
+      missing-topics-fatal: false
+    admin:
+      fail-fast: false
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        concurrency: ${benchmark.listener-concurrency}
+
+logging:
+  level:
+    root: INFO
