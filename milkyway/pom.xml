@@ -22,7 +22,6 @@
     <modules>
         <module>../rsa-aes</module>
         <module>../streams</module>
-        <module>../algorithms</module>
         <module>../thread-local</module>
         <module>../weld-demo</module>
         <module>../leetcode-templates</module>

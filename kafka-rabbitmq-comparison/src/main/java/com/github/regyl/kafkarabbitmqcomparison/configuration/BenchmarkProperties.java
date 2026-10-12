@@ -2,14 +2,16 @@ package com.github.regyl.kafkarabbitmqcomparison.configuration;
 
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.time.Duration;
+import java.util.List;
 
 @ConfigurationProperties(prefix = "benchmark")
 public record BenchmarkProperties(
         Broker broker,
-        long eventsPerSecond,
+        List<Long> eventsPerSecond,
         Duration duration,
         Duration warmup,
         Duration drainTimeout,
@@ -22,8 +24,15 @@ public record BenchmarkProperties(
         if (broker == null) {
             broker = Broker.KAFKA;
         }
-        if (eventsPerSecond <= 0) {
-            eventsPerSecond = 1_000;
+        if (CollectionUtils.isEmpty(eventsPerSecond)) {
+            eventsPerSecond = List.of(1_000L);
+        } else {
+            for (Long rate : eventsPerSecond) {
+                if (rate == null || rate <= 0) {
+                    throw new IllegalArgumentException("benchmark.events-per-second values must be positive");
+                }
+            }
+            eventsPerSecond = List.copyOf(eventsPerSecond);
         }
         if (duration == null || duration.isZero() || duration.isNegative()) {
             duration = Duration.ofSeconds(30);

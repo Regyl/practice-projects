@@ -35,15 +35,23 @@
     </module>
     <module name="RegexpSingleline">
         <property name="format" value="[A-Za-z]+ != null &amp;&amp; ![A-Za-z]+\.(isBlank|isEmpty)\(\)"/>
-        <property name="message" value="Please use StringUtils::hasLength"/>
+        <property name="message" value="Please use StringUtils.hasLength for strings and CollectionUtils.isEmpty for collections"/>
     </module>
     <module name="RegexpSingleline">
         <property name="format" value="[A-Za-z]+ == null \|\| [A-Za-z]+\.(isBlank|isEmpty)\(\)"/>
-        <property name="message" value="Please use StringUtils::hasLength"/>
+        <property name="message" value="Please use StringUtils.hasLength for strings and CollectionUtils.isEmpty for collections"/>
     </module>
     <module name="RegexpSingleline">
         <property name="format" value="mapstruct"/>
         <property name="message" value="Please never use it here. I hate it"/>
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="\@Service"/>
+        <property name="message" value="Please never use it here. I hate it. Use @Component"/>
+    </module>
+    <module name="RegexpSingleline">
+        <property name="format" value="LoggerFactory\.getLogger\("/>
+        <property name="message" value="Use @Slf4j from lombok"/>
     </module>
 
     <module name="SuppressWarningsFilter"/>

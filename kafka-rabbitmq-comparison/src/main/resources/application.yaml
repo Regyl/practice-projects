@@ -1,6 +1,11 @@
 benchmark:
   broker: all #kafka|rabbitmq|redis|activemq|all
-  events-per-second: 1000
+  events-per-second:
+    - 100
+    - 1000
+    - 5000
+    - 10000
+    - 50000
   duration: 60s
   warmup: 10s
   drain-timeout: 30s
