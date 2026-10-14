@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.consumer;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.RabbitMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
@@ -8,6 +9,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@RabbitMqEnabled
 public class RabbitMqListener implements MqListener {
 
     private final LatencyRecorder latencyRecorder;

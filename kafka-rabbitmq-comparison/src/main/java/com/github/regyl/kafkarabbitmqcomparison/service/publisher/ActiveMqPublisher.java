@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.publisher;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.ActiveMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
@@ -16,6 +17,7 @@ import java.util.concurrent.Semaphore;
 
 @Slf4j
 @Component
+@ActiveMqEnabled
 @RequiredArgsConstructor
 public class ActiveMqPublisher implements MqPublisher {
 

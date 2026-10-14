@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.consumer;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.KafkaMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
@@ -8,6 +9,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@KafkaMqEnabled
 public class KafkaMqListener implements MqListener {
 
     private final LatencyRecorder latencyRecorder;

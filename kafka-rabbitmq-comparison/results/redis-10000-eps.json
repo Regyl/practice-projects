@@ -1,15 +1,15 @@
 {
   "broker" : "redis",
   "targetEps" : 10000,
-  "achievedPublishEps" : 6289.533333333334,
-  "achievedConsumeEps" : 6289.516666666666,
-  "sentCount" : 377372,
-  "receivedCount" : 377371,
-  "minMicros" : 369,
-  "meanMicros" : 506.5251860900811,
-  "p50Micros" : 459,
-  "p95Micros" : 669,
-  "p99Micros" : 1118,
-  "p999Micros" : 5807,
-  "maxMicros" : 52927
+  "achievedPublishEps" : 7404.3,
+  "achievedConsumeEps" : 7404.283333333334,
+  "sentCount" : 444258,
+  "receivedCount" : 444257,
+  "minMicros" : 352,
+  "meanMicros" : 496.5908944597384,
+  "p50Micros" : 450,
+  "p95Micros" : 639,
+  "p99Micros" : 1065,
+  "p999Micros" : 6043,
+  "maxMicros" : 66047
 }

@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.publisher;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.RedisMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.Semaphore;
 
 @Component
+@RedisMqEnabled
 @RequiredArgsConstructor
 public class RedisMqPublisher implements MqPublisher {
 

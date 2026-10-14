@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.configuration;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.RedisMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.data.redis.autoconfigure.RedisMessageListenerContainerConfigurer;
@@ -22,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration
+@RedisMqEnabled
 @EnableRedisListeners
 public class RedisBenchmarkConfig {
 

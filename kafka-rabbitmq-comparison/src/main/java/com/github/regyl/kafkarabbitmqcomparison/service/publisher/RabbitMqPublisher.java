@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.publisher;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.RabbitMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
@@ -13,6 +14,7 @@ import java.util.concurrent.Semaphore;
 
 @Slf4j
 @Component
+@RabbitMqEnabled
 @RequiredArgsConstructor
 public class RabbitMqPublisher implements MqPublisher {
 

@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.service.publisher;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.KafkaMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.AuthCodeMessageModel;
 import com.github.regyl.kafkarabbitmqcomparison.model.Broker;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.Semaphore;
 
 @Component
+@KafkaMqEnabled
 @RequiredArgsConstructor
 public class KafkaMqPublisher implements MqPublisher {
 

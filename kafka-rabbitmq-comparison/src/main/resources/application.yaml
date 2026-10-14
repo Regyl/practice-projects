@@ -1,5 +1,5 @@
 benchmark:
-  broker: all #kafka|rabbitmq|redis|activemq|all
+  broker: redis #kafka|rabbitmq|redis|activemq|all
   events-per-second:
     - 100
     - 1000

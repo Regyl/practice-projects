@@ -1,5 +1,6 @@
 package com.github.regyl.kafkarabbitmqcomparison.configuration;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.RabbitMqEnabled;
 import com.github.regyl.kafkarabbitmqcomparison.model.MessagingNamesConstant;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -9,11 +10,13 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.boot.amqp.autoconfigure.RabbitTemplateCustomizer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
+@RabbitMqEnabled
 public class RabbitBenchmarkConfig {
 
     @Bean

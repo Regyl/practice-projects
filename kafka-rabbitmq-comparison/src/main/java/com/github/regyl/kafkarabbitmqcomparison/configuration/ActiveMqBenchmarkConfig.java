@@ -1,10 +1,12 @@
 package com.github.regyl.kafkarabbitmqcomparison.configuration;
 
+import com.github.regyl.kafkarabbitmqcomparison.annotation.ActiveMqEnabled;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.DeliveryMode;
 import jakarta.jms.Session;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.jms.ConnectionFactoryUnwrapper;
 import org.springframework.boot.jms.autoconfigure.DefaultJmsListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +18,7 @@ import org.springframework.jms.support.converter.MessageType;
 import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
+@ActiveMqEnabled
 public class ActiveMqBenchmarkConfig {
 
     private static final String TYPE_ID_PROPERTY = "_type";

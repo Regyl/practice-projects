@@ -42,6 +42,7 @@ public class LoadGenerator implements ApplicationRunner {
         for (Broker broker : selectedBrokers()) {
             for (long eventsPerSecond : properties.eventsPerSecond()) {
                 runOne(broker, eventsPerSecond);
+                System.gc();
             }
         }
         log.info("Benchmark finished. Reports are in {}", properties.resultsDir());
