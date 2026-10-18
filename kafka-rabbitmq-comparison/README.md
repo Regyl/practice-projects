@@ -1,5 +1,7 @@
 # Introduction
 
+## Results
+![latency-1000-eps.png](results/plots/latency-1000-eps.png)
 
 ## Limits
 - Apache Kafka without idempotency

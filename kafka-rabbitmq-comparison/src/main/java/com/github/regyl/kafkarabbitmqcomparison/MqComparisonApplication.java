@@ -7,10 +7,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties(BenchmarkProperties.class)
-public class KafkaRabbitmqComparisonApplication {
+public class MqComparisonApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(KafkaRabbitmqComparisonApplication.class, args);
+        SpringApplication.run(MqComparisonApplication.class, args);
     }
 
 }

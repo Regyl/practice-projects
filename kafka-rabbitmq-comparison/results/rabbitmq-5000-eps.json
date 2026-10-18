@@ -7,9 +7,9 @@
   "receivedCount" : 300000,
   "minMicros" : 305,
   "meanMicros" : 1202.9727266666666,
-  "p50Micros" : 617,
-  "p95Micros" : 1868,
-  "p99Micros" : 12311,
-  "p999Micros" : 81407,
+  "p50Micros" : 618,
+  "p95Micros" : 1859,
+  "p99Micros" : 12021,
+  "p999Micros" : 21394,
   "maxMicros" : 105983
 }
