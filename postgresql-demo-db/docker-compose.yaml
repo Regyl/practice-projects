@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: 'postgres:18.6'
+    container_name: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'pwd'
+      POSTGRES_DB: 'db'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+      - ./demo-20250901-1y.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+volumes:
+  postgres_data:
