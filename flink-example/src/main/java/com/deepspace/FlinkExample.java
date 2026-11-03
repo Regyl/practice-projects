@@ -19,7 +19,7 @@ public class FlinkExample {
     private static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
 
     public static void main(String[] args) throws Exception {
-//        log.info("Starting Flink Example");
+        log.info("Starting Flink Example");
         String propertiesFilePath = "flink-example/src/main/resources/conf.properties";
         ParameterTool params = ParameterTool.fromPropertiesFile(propertiesFilePath);
 
@@ -31,7 +31,7 @@ public class FlinkExample {
         DataStream<Row> mapped = dataStream.map(item -> {
             Row row = new Row(RowKind.INSERT, 2);
             JsonNode node = MAPPER.readTree(item);
-            row.setField(0, node.get("@timestamp").asLong());
+            row.setField(0, node.get("@timestamp").asInt());
             row.setField(1, node.get("rand_value").asText());
             return row;
         });

@@ -46,11 +46,11 @@ public class SinkSupplier {
 
     public static CassandraSink<Row> getCassandraSink(DataStream<Row> stream, ParameterTool params) {
         try {
-            RowTypeInfo rowTypeInfo = new RowTypeInfo(Types.ROW(Types.STRING, Types.STRING));
+            RowTypeInfo rowTypeInfo = new RowTypeInfo(Types.ROW(Types.INT, Types.STRING));
             SerializerConfig config = new SerializerConfigImpl();
             TypeSerializer<Row> rowSerializer = rowTypeInfo.createSerializer(config);
             return new CassandraSink.CassandraRowSinkBuilder(stream, rowTypeInfo, rowSerializer)
-                    .setHost("127.0.0.1", 9042) // Set your Cassandra contact point and port
+                    .setHost("127.0.0.1", 9042)
                     .setQuery("INSERT INTO dev_keyspace.test(timestamp, val) values (?, ?);")
                     .build();
         } catch (Exception e) {
