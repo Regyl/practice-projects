@@ -1,13 +1,19 @@
 package com.deepspace;
 
-import com.deepspace.model.Configs;
-import org.apache.flink.api.connector.sink2.Sink;
-import org.apache.flink.connector.clickhouse.convertor.ClickHouseConvertor;
-import org.apache.flink.connector.clickhouse.sink.ClickHouseAsyncSink;
-import org.apache.flink.connector.clickhouse.sink.ClickHouseClientConfig;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.serialization.SerializerConfig;
+import org.apache.flink.api.common.serialization.SerializerConfigImpl;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.api.common.typeutils.TypeSerializer;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.api.java.typeutils.runtime.RowSerializer;
+import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
 import org.apache.flink.types.Row;
-import org.apache.flink.util.ParameterTool;
 
+@Slf4j
 public class SinkSupplier {
 
     static final int MAX_BATCH_SIZE = 5000;
@@ -17,7 +23,7 @@ public class SinkSupplier {
     static final long MAX_TIME_IN_BUFFER_MS = 5 * 1000;
     static final long MAX_RECORD_SIZE_IN_BYTES = 1000;
 
-    public static Sink<Row> getClickhouseSink(ParameterTool params) {
+/*    public static Sink<Row> getClickhouseSink(ParameterTool params) {
         String url = params.get(Configs.Clickhouse.HOSTS);
         String username = params.get(Configs.Clickhouse.USERNAME);
         String password = params.get(Configs.Clickhouse.PASSWORD);
@@ -36,5 +42,20 @@ public class SinkSupplier {
                 .setMaxRecordSizeInBytes(MAX_RECORD_SIZE_IN_BYTES)
                 .setClickHouseClientConfig(clickHouseClientConfig)
                 .build();
+    }*/
+
+    public static CassandraSink<Row> getCassandraSink(DataStream<Row> stream, ParameterTool params) {
+        try {
+            RowTypeInfo rowTypeInfo = new RowTypeInfo(Types.ROW(Types.STRING, Types.STRING));
+            SerializerConfig config = new SerializerConfigImpl();
+            TypeSerializer<Row> rowSerializer = rowTypeInfo.createSerializer(config);
+            return new CassandraSink.CassandraRowSinkBuilder(stream, rowTypeInfo, rowSerializer)
+                    .setHost("127.0.0.1", 9042) // Set your Cassandra contact point and port
+                    .setQuery("INSERT INTO dev_keyspace.test(timestamp, val) values (?, ?);")
+                    .build();
+        } catch (Exception e) {
+//            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -2,9 +2,10 @@ package com.deepspace;
 
 import com.deepspace.model.Configs;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
-import org.apache.flink.util.ParameterTool;
+
 
 public class SourceSupplier {
 
