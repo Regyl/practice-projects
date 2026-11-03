@@ -1,0 +1,19 @@
+service:
+  log_level: info
+
+pipeline:
+  inputs:
+#    - name: winlog
+#      channels: setup,Windows Powershell
+#      interval_sec: 1
+#      db: winlog.sqlite
+    - name: random
+      samples: -1
+      interval_sec: 1
+      interval_nsec: 0
+
+  outputs:
+    - name: kafka
+      match: '*'
+      brokers: kafka:29092
+      topics: test

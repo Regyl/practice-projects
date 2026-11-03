@@ -1,0 +1,7 @@
+- S3 + Apache Iceberg
+- [Pick best serializer](https://flink.apache.org/2020/04/15/flink-serialization-tuning-vol.-1-choosing-your-serializer-if-you-can/#:~:text=DiscardingSink%3C%3E())%3B-,After,-running%20this%20through)
+- Add DI
+- Add logging through logback [doc](https://nightlies.apache.org/flink/flink-docs-stable/docs/deployment/advanced/logging/)
+- Dagger for traces
+- Pass configs
+- What is a flink shaded

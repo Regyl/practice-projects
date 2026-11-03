@@ -20,12 +20,10 @@
     <version>1.0</version>
 
     <modules>
-        <module>../rsa-aes</module>
         <module>../streams</module>
         <module>../thread-local</module>
         <module>../weld-demo</module>
         <module>../leetcode-templates</module>
-        <module>../flink-example</module>
     </modules>
 
     <packaging>pom</packaging>
