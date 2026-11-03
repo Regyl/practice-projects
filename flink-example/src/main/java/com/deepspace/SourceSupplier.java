@@ -1,6 +1,7 @@
 package com.deepspace;
 
 import com.deepspace.model.Configs;
+import com.deepspace.util.KafkaOffsetSupplier;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -14,7 +15,7 @@ public class SourceSupplier {
                 .setBootstrapServers(params.get(Configs.Kafka.HOSTS))
                 .setTopics(params.get(Configs.Kafka.TOPIC))
                 .setGroupId(params.get(Configs.Kafka.GROUP_ID))
-                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setStartingOffsets(KafkaOffsetSupplier.get(params))
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
     }

@@ -50,7 +50,7 @@ public class SinkSupplier {
             SerializerConfig config = new SerializerConfigImpl();
             TypeSerializer<Row> rowSerializer = rowTypeInfo.createSerializer(config);
             return new CassandraSink.CassandraRowSinkBuilder(stream, rowTypeInfo, rowSerializer)
-                    .setHost("127.0.0.1", 9042)
+                    .setHost(params.get("sink.cassandra.host"), params.getInt("sink.cassandra.port"))
                     .setQuery("INSERT INTO dev_keyspace.test(timestamp, val) values (?, ?);")
                     .build();
         } catch (Exception e) {

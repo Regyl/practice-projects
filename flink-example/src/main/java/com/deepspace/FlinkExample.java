@@ -36,9 +36,6 @@ public class FlinkExample {
             return row;
         });
 
-//        Sink<Row> sink = SinkSupplier.getClickhouseSink(params);
-//        mapped.sinkTo(sink);
-
         SinkSupplier.getCassandraSink(mapped, params);
 
         env.execute("Flink Example Job");
