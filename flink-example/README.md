@@ -3,5 +3,6 @@
 - Add DI
 - Add logging through logback [doc](https://nightlies.apache.org/flink/flink-docs-stable/docs/deployment/advanced/logging/)
 - Dagger for traces
-- Pass configs
+- Dynamic configs (probably through the broadcast)
 - What is a flink shaded
+- Fluent-bit should send kafka message with hostname as a partition key
