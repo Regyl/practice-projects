@@ -6,8 +6,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-#    extra_hosts:
-#      - "host.docker.internal:host-gateway"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: [ "/fluent-bit/bin/fluent-bit", "-c", "/fluent-bit/etc/fluent-bit.yaml" ]
     ports:
       - "2020:2020"
