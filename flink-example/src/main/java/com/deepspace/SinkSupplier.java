@@ -1,19 +1,10 @@
 package com.deepspace;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.flink.api.common.serialization.SerializerConfig;
-import org.apache.flink.api.common.serialization.SerializerConfigImpl;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.common.typeutils.TypeSerializer;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
-import org.apache.flink.api.java.typeutils.runtime.RowSerializer;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.connectors.cassandra.CassandraSink;
 import org.apache.flink.types.Row;
 
-@Slf4j
 public class SinkSupplier {
 
     static final int MAX_BATCH_SIZE = 5000;
@@ -46,15 +37,11 @@ public class SinkSupplier {
 
     public static CassandraSink<Row> getCassandraSink(DataStream<Row> stream, ParameterTool params) {
         try {
-            RowTypeInfo rowTypeInfo = new RowTypeInfo(Types.ROW(Types.INT, Types.STRING));
-            SerializerConfig config = new SerializerConfigImpl();
-            TypeSerializer<Row> rowSerializer = rowTypeInfo.createSerializer(config);
-            return new CassandraSink.CassandraRowSinkBuilder(stream, rowTypeInfo, rowSerializer)
+            return CassandraSink.addSink(stream)
                     .setHost(params.get("sink.cassandra.host"), params.getInt("sink.cassandra.port"))
                     .setQuery("INSERT INTO dev_keyspace.test(timestamp, val) values (?, ?);")
                     .build();
         } catch (Exception e) {
-//            log.error(e.getMessage());
             throw new RuntimeException(e);
         }
     }

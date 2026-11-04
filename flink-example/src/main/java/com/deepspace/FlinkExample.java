@@ -5,7 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.connector.sink2.Sink;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.common.typeinfo.Types;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -17,6 +18,8 @@ import org.apache.flink.types.RowKind;
 public class FlinkExample {
 
     private static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
+    static final TypeInformation<Row> ROW_TYPE =
+            Types.ROW_NAMED(new String[] {"timestamp", "val"}, Types.INT, Types.STRING);
 
     public static void main(String[] args) throws Exception {
         log.info("Starting Flink Example");
@@ -33,8 +36,9 @@ public class FlinkExample {
             JsonNode node = MAPPER.readTree(item);
             row.setField(0, node.get("@timestamp").asInt());
             row.setField(1, node.get("rand_value").asText());
+            log.info(row.toString());
             return row;
-        });
+        }).returns(ROW_TYPE);
 
         SinkSupplier.getCassandraSink(mapped, params);
 
