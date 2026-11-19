@@ -13,8 +13,8 @@ import java.io.IOException;
 
 public class Main {
 
-    private static final String INPUT_PATH = "hadoop-dependency-risk-radar/src/main/resources/input.txt";
-    private static final String OUTPUT_PATH = "hadoop-dependency-risk-radar/src/main/resources/output";
+    private static final String INPUT_PATH = "hadoop-example/src/main/resources/input.txt";
+    private static final String OUTPUT_PATH = "hadoop-example/src/main/resources/output";
 
     static void main() throws IOException, InterruptedException, ClassNotFoundException {
 
