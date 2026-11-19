@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Component
-@Deprecated
+// @Deprecated
 public class SendFailureLogger {
 
     private final AtomicBoolean logged = new AtomicBoolean();
