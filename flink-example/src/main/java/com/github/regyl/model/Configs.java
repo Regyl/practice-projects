@@ -1,4 +1,4 @@
-package com.deepspace.model;
+package com.github.regyl.model;
 
 import lombok.experimental.UtilityClass;
 

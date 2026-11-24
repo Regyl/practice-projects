@@ -1,4 +1,4 @@
-package com.deepspace;
+package com.github.regyl;
 
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -39,7 +39,7 @@ public class SinkSupplier {
         try {
             return CassandraSink.addSink(stream)
                     .setHost(params.get("sink.cassandra.host"), params.getInt("sink.cassandra.port"))
-                    .setQuery("INSERT INTO dev_keyspace.test(timestamp, val) values (?, ?);")
+                    .setQuery(params.get("sink.cassandra.query"))
                     .build();
         } catch (Exception e) {
             throw new RuntimeException(e);

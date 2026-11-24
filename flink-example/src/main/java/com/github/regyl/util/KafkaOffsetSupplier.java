@@ -1,4 +1,4 @@
-package com.deepspace.util;
+package com.github.regyl.util;
 
 import lombok.experimental.UtilityClass;
 import org.apache.flink.api.java.utils.ParameterTool;
