@@ -2,10 +2,11 @@
 
 import json
 import logging
+import shutil
 import subprocess
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import mkdtemp
 
 from airflow.exceptions import AirflowNotFoundException
 from airflow.sdk import DAG, Connection, task
@@ -22,11 +23,12 @@ with DAG(
     start_date=datetime(2026, 1, 1, tzinfo=timezone.utc),
     catchup=False,
     max_active_runs=1,
+    default_args={"retries": 1, "retry_delay": timedelta(minutes=1)},
     tags=["cassandra", "hdfs"],
 ) as dag:
 
-    @task(retries=1, retry_delay=timedelta(minutes=1))
-    def export_logs() -> None:
+    @task
+    def export_logs() -> str:
         from cassandra.auth import PlainTextAuthProvider
         from cassandra.cluster import Cluster
         from cassandra.query import SimpleStatement
@@ -43,9 +45,10 @@ with DAG(
             auth_provider = PlainTextAuthProvider(connection.login, connection.password)
 
         query = SimpleStatement("SELECT log FROM dev.fluent_bit_logs", fetch_size=1000)
-        with TemporaryDirectory(prefix="cassandra_logs_") as directory:
-            local_export = Path(directory) / Path(HDFS_EXPORT).name
-            row_count = 0
+        directory = Path(mkdtemp(prefix="cassandra_logs_"))
+        local_export = directory / Path(HDFS_EXPORT).name
+        row_count = 0
+        try:
             with Cluster(["127.0.0.1"], port=9042, auth_provider=auth_provider) as cluster:
                 session = cluster.connect()
                 with local_export.open("w", encoding="utf-8") as output:
@@ -53,10 +56,21 @@ with DAG(
                         output.write(json.dumps({"log": row.log}, ensure_ascii=False) + "\n")
                         row_count += 1
 
-            subprocess.run(
-                [HDFS_CLI, "dfs", "-put", "-f", str(local_export), HDFS_EXPORT],
-                check=True,
-            )
-            LOGGER.info("Exported %d logs to %s", row_count, HDFS_EXPORT)
+        except BaseException:
+            shutil.rmtree(directory, ignore_errors=True)
+            raise
 
-    export_logs()
+        LOGGER.info("Extracted %d logs from Cassandra", row_count)
+        return str(local_export)
+
+    @task
+    def upload_logs(local_export: str) -> None:
+        subprocess.run(
+            [HDFS_CLI, "dfs", "-put", "-f", local_export, HDFS_EXPORT],
+            check=True,
+        )
+        shutil.rmtree(Path(local_export).parent, ignore_errors=True)
+        LOGGER.info("Uploaded logs to %s", HDFS_EXPORT)
+
+    local_export = export_logs()
+    upload_logs(local_export)
