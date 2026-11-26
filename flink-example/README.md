@@ -5,3 +5,7 @@
 - Dynamic configs (probably through the broadcast)
 - What is a flink shaded
 - Fluent-bit should send kafka message with hostname as a partition key
+
+```mvn
+mvn clean install -P prod
+```

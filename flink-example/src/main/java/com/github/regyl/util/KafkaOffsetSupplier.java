@@ -1,7 +1,7 @@
 package com.github.regyl.util;
 
 import lombok.experimental.UtilityClass;
-import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.util.ParameterTool;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 
 @UtilityClass

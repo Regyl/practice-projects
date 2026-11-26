@@ -20,7 +20,7 @@ public class MapSupplier implements MapFunction<String, Row> {
     public static final TypeInformation<Row> ROW_TYPE =
             Types.ROW_NAMED(new String[] {"id", "hostname", "timestamp", "log"}, Types.STRING, Types.STRING, Types.INT, Types.STRING);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper().findAndRegisterModules();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     public Row map(String item) throws Exception {

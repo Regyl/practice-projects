@@ -1,7 +1,7 @@
 package com.github.regyl;
 
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
-import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.util.ParameterTool;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 
 import com.github.regyl.model.Configs;
