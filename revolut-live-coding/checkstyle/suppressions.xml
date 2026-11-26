@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <!--TODO should suppress only 'Calling DateTime.now() is forbidden. Use supplier'-->
+    <suppress files=".*Test\.java" checks="RegexpSingleline"/>
+</suppressions>
