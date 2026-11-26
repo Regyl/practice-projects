@@ -1,0 +1,1 @@
+Feel free to ask any question or suggest new template/fixes by creating an issue!

@@ -1,0 +1,994 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "google/gemma-4-e4b",
+          "mode": "list",
+          "cachedResultName": "GOOGLE/GEMMA-4-E4B"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Role: Act as a specialized Email Parser and Recruitment Data Analyst.\n\nTask: Analyze the provided email and categorize it into a structured JSON format based on specific recruitment status markers.\n\nCategorization Logic (Priority Order):\n- In Process: Use this if the email asks for a meeting, provides a scheduling link (Calendly, etc.), suggests a time for a call/technical round, or confirms a scheduled interview.\n- Applied: Use this for initial application confirmations or \"Thanks for applying\" messages.\n- Rejected: Use this if they are not moving forward or the position is closed or mention that regret to inform you.\n- Other: Use this for any email NOT related to a job application (newsletters, personal, marketing).\n\nExtraction Rules:\n- Company: Extract the formal company name. Check the body first, then the \"Email From\" domain. Keep in mind that Indeed, Glassdoor, LinkedIn and Greenhouse are not the companies the candidate applying for. It's a job board.\n- JobRole: Identify the specific job title. If none is found or if status is \"Other\", return \"Not Specified\".\n- Source: Job board where candidate applied. Usually it's Indeed, Glassdoor, LinkedIn, getmatch, Dice and Greenhouse. Return other if not identified.\n- JobLink: Links like \"apply.indeed.com\" within the body. Return \"Other\" if not found anything\n- Country: based on the company name and mail body try to figure out the company's Country. If not found return \"Other\"\n\nFormat: Return ONLY a valid JSON object. No prose.\n\nInput Data:\nFrom: {{ $json.headers.from }}\nSubject: {{ $json.headers.subject }}\nBody: {{ $json.text }}\n\nJSON Schema:\n{\n  \"Status\": \"Applied | Rejected | In Process | Other\",\n  \"Company\": \"string\",\n  \"JobRole\": \"string\",\n  \"Source\": \"string\",\n  \"JobLink\": \"string\",\n  \"Country\": \"string\"\n}"
+            },
+            {
+              "role": "system",
+              "content": "Return only valid JSON, without ```json and such things."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        -48
+      ],
+      "id": "793485a5-3256-477f-b345-fd056126d530",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "jxTYYREcGIr8FVYj",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=#JobStatus\n\nCompany: {{ $json.Company }}\nRole: {{ $json[\"Job title\"] }}\nStatus: {{ $json.Status }}",
+        "additionalFields": {
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1488,
+        -96
+      ],
+      "id": "b03a6704-b272-4a56-895d-b34f66f4b9ba",
+      "name": "Send a text message",
+      "webhookId": "90774d5e-2d26-4eb0-95fa-70d3c6a05a20",
+      "credentials": {
+        "telegramApi": {
+          "id": "wsaIHGh390kDcUxr",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "google/gemma-4-e4b",
+          "mode": "list",
+          "cachedResultName": "GOOGLE/GEMMA-4-E4B"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Role: Act as a specialized Job Parser and Recruitment Data Analyst.\n\nTask: Analyze the provided job description and categorize it into a structured JSON format based on specific recruitment status markers.\n\nCategorization Logic (Priority Order):\n- In Process: Use this if the email asks for a meeting, provides a scheduling link (Calendly, etc.), suggests a time for a call/technical round, or confirms a scheduled interview.\n- Applied: Use this for initial application confirmations or \"Thanks for applying\" messages.\n- Rejected: Use this if they are not moving forward or the position is closed or mention that regret to inform you.\n- Other: Use this for any email NOT related to a job application (newsletters, personal, marketing).\n\nExtraction Rules:\n- Company: Extract the formal company name. Keep in mind that Indeed, Glassdoor, LinkedIn and Greenhouse are not the companies the candidate applying for. It's a job board.\n- JobRole: Identify the specific job title. If none is found or if status is \"Other\", return \"Not Specified\".\n- Source: Job board where candidate applied. Usually it's Indeed, Glassdoor, LinkedIn and Greenhouse. Return other if not identified.\n- JobLink: Links like \"apply.indeed.com\" within the body. Return \"Other\" if not found anything\n- Country: based on the company name and mail body try to figure out the company's Country. If not found return \"Other\"\n\nFormat: Return ONLY a valid JSON object. No prose.\n\nInput Data:\nBody: {{ $json['Job payload'] }}\n\nJSON Schema:\n{\n  \"Status\": \"Applied | Rejected | In Process | Other\",\n  \"Company\": \"string\",\n  \"JobRole\": \"string\",\n  \"Source\": \"string\",\n  \"JobLink\": \"string\",\n  \"Country\": \"string\"\n}"
+            },
+            {
+              "role": "system",
+              "content": "Return only valid JSON, without ```json and such things."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        -272
+      ],
+      "id": "a6ef3eb2-a76c-42eb-b7ca-2905015fb530",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "jxTYYREcGIr8FVYj",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "019ac3b6-f45a-4067-8b45-97183e334533",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Other",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        -48
+      ],
+      "id": "8e98ee0c-334a-4634-b136-57254dc2f4d5",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4e47585f-263d-4330-98d1-a96e16e57e3d",
+                    "leftValue": "={{ $json.Status }}",
+                    "rightValue": "Applied",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Applied"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ee775ea9-ef8a-4686-aedd-a17bd5b3cd0a",
+                    "leftValue": "={{ $json.Status }}",
+                    "rightValue": "Rejected",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Rejected"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "18806ea9-d2c2-455d-82d8-9636eff59f9b",
+                    "leftValue": "={{ $json.Status }}",
+                    "rightValue": "In Process",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "In Process"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        944,
+        -80
+      ],
+      "id": "27733007-31b5-4af5-9256-28c9882e102b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg",
+          "mode": "list",
+          "cachedResultName": "Applied vacancies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.Company }}:{{ $json.JobRole }}",
+            "Company": "={{ $json.Company }}",
+            "Job title": "={{ $json.JobRole }}",
+            "Status": "={{ $json.Status }}",
+            "Source": "={{ $json.Source }}",
+            "Link": "={{ $json.JobLink }}",
+            "Country": "={{ $json.Country }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Apply date",
+              "displayName": "Apply date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job title",
+              "displayName": "Job title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking",
+              "displayName": "Tracking",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "baf6a633-2838-4558-8f8e-cdf88d31303d",
+      "name": "In Process",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1264,
+        224
+      ],
+      "typeVersion": 4.7,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UfgDkHh8YkIqHFAl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg",
+          "mode": "list",
+          "cachedResultName": "Applied vacancies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.Company }}:{{ $json.JobRole }}",
+            "Apply date": "={{ new Date(Date.now()).toLocaleDateString('en-GB') }}",
+            "Company": "={{ $json.Company }}",
+            "Job title": "={{ $json.JobRole }}",
+            "Status": "={{ $json.Status }}",
+            "Source": "={{ $json.Source }}",
+            "Link": "={{ $json.JobLink }}",
+            "Country": "={{ $json.Country }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Apply date",
+              "displayName": "Apply date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job title",
+              "displayName": "Job title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking",
+              "displayName": "Tracking",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "904a913e-7070-4b4d-866e-02d9822da05a",
+      "name": "Applied",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1264,
+        -96
+      ],
+      "typeVersion": 4.7,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UfgDkHh8YkIqHFAl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg",
+          "mode": "list",
+          "cachedResultName": "Applied vacancies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JiHYQ29j9fEqpaSc_73LiVOnO_YJUBkIeTbidB0Hhjg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.Company }}:{{ $json.JobRole }}",
+            "Rejection date": "={{ new Date(Date.now()).toLocaleDateString('en-GB') }}",
+            "Country": "={{ $json.Country }}",
+            "Company": "={{ $json.Company }}",
+            "Job title": "={{ $json.JobRole }}",
+            "Status": "={{ $json.Status }}",
+            "Source": "={{ $json.Source }}",
+            "Link": "={{ $json.JobLink }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Apply date",
+              "displayName": "Apply date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Rejection date",
+              "displayName": "Rejection date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job title",
+              "displayName": "Job title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tracking",
+              "displayName": "Tracking",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d501e722-4fdb-43c5-a1fa-799d059d2cb9",
+      "name": "Rejected",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1264,
+        64
+      ],
+      "typeVersion": 4.7,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UfgDkHh8YkIqHFAl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "inputStr = $input.item.json.output[0].content[0].text;\nif (inputStr.includes(\"```json\")) {\n  inputStr = inputStr.substring(7, inputStr.length - 3)\n}\nreturn JSON.parse(inputStr);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        -48
+      ],
+      "id": "7af5cb2f-cc98-4fcc-a22f-f234a037eff9",
+      "name": "Convert String to JSON"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "inputStr = $input.item.json.output[0].content[0].text;\nif (inputStr.includes(\"```json\")) {\n  inputStr = inputStr.substring(7, inputStr.length - 3)\n}\nreturn JSON.parse(inputStr);\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        -272
+      ],
+      "id": "ca25f885-0a7b-414f-aa44-7595a9f09c0a",
+      "name": "Convert String to JSON1"
+    },
+    {
+      "parameters": {
+        "content": "# Job Application Status Tracking\nThis workflow allows you to connect Gmail and track job applications statuses using OpenAI-compatible model and save result into Google Sheets.\n\n\n## How it works\n1. Receives data from either _manual submission_ or _Gmail_ email. The second one checks for new emails each minute.\n2. Calls OpenAI-compatible model to extract data\n3. Based on the application status routes to an appropriate Google Sheet mapper.\n4. Sends a notification to Telegram.\n\n## Setup\n- [ ] Setup your Gmail credentials by creating client_id and client_secret from [cloud console](console.cloud.google.com/)\n- [ ] Setup your Google Sheets credentials on the same [cloud console](console.cloud.google.com/) from the previous step\n- [ ] In your google account create a sheet named **Applied vacancies** with columns: ID, Apply date, Rejection date, Country, Source, Company, Job title, Status, Link\n- [ ] (Optional) Add your Telegram chatId to the _Send notification_ node\n- [ ] Enjoy!\n\n## Customize\n- Since this workflow allows use any OpenAI-compatible model you can use even self-hosted LLMs through LM Studio like gemma-4-e4b. I strongly suggest to use a self-hosted one since you have to pass **every** email to check if it about job application or not.\n- If you want to add more job sources for the trigger _Form_ you can easily achieve this by modifying _dropdown_ field in this trigger.",
+        "height": 704,
+        "width": 608
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -752,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "fba2b92a-ffa6-42d2-87ac-bfdf2655e1fe",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Manual submission\nIt's always have Applied status.",
+        "height": 224,
+        "width": 1184,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -352
+      ],
+      "typeVersion": 1,
+      "id": "2419cadb-48a6-4e74-a44a-f94b7fbd1d70",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Automatic processing from mail",
+        "height": 256,
+        "width": 1152,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "d065255b-68f2-4c9f-959b-6e0e5efb4457",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "id": "c764f6e1-4107-43a6-9eb5-e2641d12314e",
+      "name": "Gmail",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "position": [
+        -32,
+        -48
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "syod7HeWqmWcXXZU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Convert to Google Sheet table\n\nEach conversion has different fields depending on application status",
+        "height": 720,
+        "width": 208,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -288
+      ],
+      "typeVersion": 1,
+      "id": "bd5de71a-1b8a-4184-84aa-77c523b96d23",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Send alert",
+        "height": 192,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1424,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "2ce9cbbc-84bc-49db-a214-3652bb6d5f2d",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "formTitle": "Job",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Job payload"
+            },
+            {
+              "fieldLabel": "Source Job Board",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "getmatch"
+                  },
+                  {
+                    "option": "LinkedIn"
+                  },
+                  {
+                    "option": "Indeed"
+                  },
+                  {
+                    "option": "Glassdoor"
+                  },
+                  {
+                    "option": "Dice"
+                  },
+                  {
+                    "option": "HH"
+                  },
+                  {
+                    "option": "Other"
+                  }
+                ]
+              }
+            },
+            {
+              "fieldLabel": "Job Link"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -32,
+        -272
+      ],
+      "id": "878f3d60-4402-43d6-9417-44d4d9e99e6c",
+      "name": "Form",
+      "webhookId": "8f147204-a6bd-4432-98fd-c1e5752a186e"
+    }
+  ],
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Convert String to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Convert String to JSON1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Applied",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "In Process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "In Process": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Applied": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejected": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert String to JSON": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert String to JSON1": {
+      "main": [
+        [
+          {
+            "node": "Applied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "93b3880bb19120a0a88bbe0c8cc74f95e5f29246d494487db557a72000ec8ca4"
+  }
+}
