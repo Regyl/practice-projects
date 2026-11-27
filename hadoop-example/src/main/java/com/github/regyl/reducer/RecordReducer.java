@@ -1,17 +1,15 @@
-package com.github.regyl;
+package com.github.regyl.reducer;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Reducer;
-
 import java.io.IOException;
 
-public class IntSumReducer extends Reducer<Text, IntWritable,Text,IntWritable> {
+public class RecordReducer extends SafeReducer<Text, IntWritable, Text, IntWritable> {
 
     private IntWritable result = new IntWritable();
 
     @Override
-    public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+    protected void reduce0(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
         int sum = 0;
         for (IntWritable val : values) {
             sum += val.get();

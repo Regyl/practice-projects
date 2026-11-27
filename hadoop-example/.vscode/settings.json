@@ -1,3 +1,6 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "problems.decorations.enabled": false,
+    "workbench.tree.indent": 20,
+    "workbench.iconTheme": null
 }

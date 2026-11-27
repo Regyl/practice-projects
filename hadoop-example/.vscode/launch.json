@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Hadoop hostname counts",
+            "request": "launch",
+            "mainClass": "com.github.regyl.Main",
+            "args": [
+                "${workspaceFolder}/src/main/resources/fluent_bit_logs.jsonl",
+                "${workspaceFolder}/target/hostname-counts-output"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}
