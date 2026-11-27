@@ -19,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 with DAG(
     dag_id="cassandra_logs_to_hdfs",
     description="Replace the HDFS export of Fluent Bit logs from Cassandra",
-    schedule="*/5 * * * *",
+    schedule="* */1 * * *",
     start_date=datetime(2026, 1, 1, tzinfo=timezone.utc),
     catchup=False,
     max_active_runs=1,
