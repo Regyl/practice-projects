@@ -20,14 +20,14 @@ LOGGER = logging.getLogger(__name__)
 
 
 with DAG(
-    dag_id="cassandra_logs_to_hdfs",
+    dag_id="cassandra_to_hadoop",
     description="Export Fluent Bit logs from Cassandra and count records by hostname",
     schedule="*/30 * * * *",
     start_date=datetime(2026, 1, 1, tzinfo=timezone.utc),
     catchup=False,
     max_active_runs=1,
     default_args={"retries": 1, "retry_delay": timedelta(minutes=1)},
-    tags=["cassandra", "hdfs"],
+    tags=["cassandra", "hdfs", "hadoop"],
 ) as dag:
 
     @task
