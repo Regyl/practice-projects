@@ -2,7 +2,6 @@ package com.github.regyl.reducer;
 
 import java.io.IOException;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import lombok.extern.slf4j.Slf4j;
