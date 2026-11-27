@@ -7,11 +7,11 @@
 
     <properties>
         <flink.version>2.3.0</flink.version>
-        <flink.cluster.scope>compile</flink.cluster.scope>
-        <maven.compiler.release>17</maven.compiler.release>
         <log4j.version>2.25.3</log4j.version>
         <lombok.version>1.18.48</lombok.version>
 
+        <cluster.scope>compile</cluster.scope>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -21,19 +21,19 @@
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java</artifactId>
             <version>${flink.version}</version>
-            <scope>${flink.cluster.scope}</scope>
+            <scope>${cluster.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients</artifactId>
             <version>${flink.version}</version>
-            <scope>${flink.cluster.scope}</scope>
+            <scope>${cluster.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-base</artifactId>
             <version>${flink.version}</version>
-            <scope>${flink.cluster.scope}</scope>
+            <scope>${cluster.scope}</scope>
         </dependency>
 
         <dependency>
@@ -64,25 +64,25 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
-            <scope>${flink.cluster.scope}</scope>
+            <scope>${cluster.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j.version}</version>
-            <scope>${flink.cluster.scope}</scope>
+            <scope>${cluster.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>${log4j.version}</version>
-            <scope>${flink.cluster.scope}</scope>
+            <scope>${cluster.scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-1.2-api</artifactId>
             <version>${log4j.version}</version>
-            <scope>${flink.cluster.scope}</scope>
+            <scope>${cluster.scope}</scope>
         </dependency>
 
     </dependencies>
@@ -110,7 +110,7 @@
         <profile>
             <id>prod</id>
             <properties>
-                <flink.cluster.scope>provided</flink.cluster.scope>
+                <cluster.scope>provided</cluster.scope>
             </properties>
             <build>
                 <plugins>
